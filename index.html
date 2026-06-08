@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مسار حياتي</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#3b82f6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="مسار حياتي" />
+  <link rel="apple-touch-icon" href="icon-192.svg" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════ -->
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="10" fill="#3b82f6"/>
+        <path d="M12 28 L20 12 L28 28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="14.5" y1="22" x2="25.5" y2="22" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      مسار حياتي
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <div class="main-content">
+    <header class="header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="icon-btn menu-btn" onclick="openSidebar()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="header-title" id="header-title">لوحة التحكم</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل الوضع"></button>
+        <button class="icon-btn" onclick="navigate('settings')" title="الإعدادات">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ══ PAGE: DASHBOARD ══ -->
+    <main class="page" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title">مرحباً بك</div>
+        <div class="page-sub" id="dash-date"></div>
+      </div>
+      <div id="dash-content"></div>
+    </main>
+
+    <!-- ══ PAGE: ENGLISH ══ -->
+    <main class="page" id="page-english">
+      <div class="page-header">
+        <div class="page-title">تعلم الإنجليزية</div>
+        <div class="page-sub">خطة 90 يوماً لإتقان اللغة</div>
+      </div>
+
+      <div class="tabs" id="eng-tabs">
+        <div class="tab-list">
+          <button class="tab-btn active" data-tab="today">اليوم</button>
+          <button class="tab-btn" data-tab="vocab">المفردات</button>
+          <button class="tab-btn" data-tab="writing">الكتابة</button>
+          <button class="tab-btn" data-tab="grammar">القواعد</button>
+          <button class="tab-btn" data-tab="plan">التقدم</button>
+        </div>
+
+        <!-- Today -->
+        <div class="tab-panel active" data-panel="today">
+          <div class="card" style="border-color:var(--primary-muted)">
+            <div class="card-header" style="background:var(--primary-light)">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;justify-content:space-between">
+                <button class="btn btn-outline btn-sm btn-icon" id="eng-prev-btn" onclick="engChangeDay(-1)" title="اليوم السابق">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+                <span class="card-title" id="eng-day-num" style="text-align:center"></span>
+                <button class="btn btn-outline btn-sm btn-icon" id="eng-next-btn" onclick="engChangeDay(1)" title="اليوم التالي">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <p style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px" id="eng-lesson"></p>
+              <p style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px">المهام اليومية الثابتة</p>
+              <div class="check-item"><input type="checkbox"><label>20 دقيقة مفردات (Anki)</label></div>
+              <div class="check-item"><input type="checkbox"><label>20 دقيقة قواعد (British Council)</label></div>
+              <div class="check-item"><input type="checkbox"><label>20 دقيقة استماع (YouTube)</label></div>
+              <div class="check-item"><input type="checkbox"><label>15 دقيقة قراءة فقرة</label></div>
+              <div class="check-item"><input type="checkbox"><label>15 دقيقة كتابة 5 جمل</label></div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top:14px">
+            <!-- Vocab input -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">كلمات اليوم</span>
+              </div>
+              <div class="card-body stack">
+                <div class="input-group"><input type="text" id="voc-word" placeholder="الكلمة (بالإنجليزية)" dir="ltr" /></div>
+                <div class="input-group"><input type="text" id="voc-meaning" placeholder="المعنى بالعربية" /></div>
+                <div class="input-group"><input type="text" id="voc-example" placeholder="مثال (جملة)" dir="ltr" /></div>
+                <button class="btn btn-primary" onclick="engAddVocab()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  إضافة الكلمة
+                </button>
+              </div>
+            </div>
+            <!-- Writing input -->
+            <div class="card">
+              <div class="card-header"><span class="card-title">كتابة اليوم</span></div>
+              <div class="card-body stack">
+                <textarea id="writing-input" placeholder="اكتب 5 جمل عن يومك أو موضوع الدرس..." dir="ltr" style="min-height:120px"></textarea>
+                <button class="btn btn-primary" onclick="engAddWriting()">حفظ الكتابة</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vocab -->
+        <div class="tab-panel" data-panel="vocab">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">قاموس المفردات (<span id="vocab-count">0 كلمة</span>)</span>
+              <div class="search-wrap" style="width:160px">
+                <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="vocab-search" placeholder="بحث..." />
+              </div>
+            </div>
+            <div class="card-body" id="vocab-list"></div>
+          </div>
+        </div>
+
+        <!-- Writing -->
+        <div class="tab-panel" data-panel="writing">
+          <div class="card">
+            <div class="card-header"><span class="card-title">سجل الكتابة</span></div>
+            <div class="card-body stack" id="writings-list"></div>
+          </div>
+        </div>
+
+        <!-- Grammar -->
+        <div class="tab-panel" data-panel="grammar">
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-header"><span class="card-title">إضافة قاعدة نحوية</span></div>
+            <div class="card-body stack">
+              <div class="input-group"><input type="text" id="gr-title" placeholder="اسم القاعدة (مثال: Present Simple)" dir="ltr" /></div>
+              <div class="input-group"><textarea id="gr-exp" placeholder="شرح مبسط بالعربية..." style="min-height:70px"></textarea></div>
+              <div class="input-group"><input type="text" id="gr-ex" placeholder="مثال (بالإنجليزية)" dir="ltr" /></div>
+              <button class="btn btn-primary" onclick="engAddGrammar()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                حفظ القاعدة
+              </button>
+            </div>
+          </div>
+          <div class="grid-2" id="grammar-list"></div>
+        </div>
+
+        <!-- Plan / Progress -->
+        <div class="tab-panel" data-panel="plan">
+          <div class="card card-highlight" style="margin-bottom:14px">
+            <div class="card-body">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="font-weight:700">التقدم الإجمالي</span>
+                <span style="font-size:18px;font-weight:800;color:var(--primary)" id="eng-progress-text"></span>
+              </div>
+              <div class="progress-wrap"><div class="progress-bar" id="eng-progress-bar" style="width:0%"></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">خطة الـ 90 يوماً</span></div>
+            <div class="card-body scroll-box" id="plan-list"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ══ PAGE: HABITS ══ -->
+    <main class="page" id="page-habits">
+      <div class="page-header">
+        <div class="page-title">تتبع العادات</div>
+        <div class="page-sub">ابنِ عادات جيدة وتخلّص من العادات السيئة</div>
+      </div>
+
+      <div class="tabs" id="habits-tabs">
+        <div class="tab-list">
+          <button class="tab-btn active" data-tab="good">العادات الجديدة</button>
+          <button class="tab-btn" data-tab="bad">العادات السيئة</button>
+          <button class="tab-btn" data-tab="analysis">التحليل الأسبوعي</button>
+        </div>
+
+        <!-- Good Habits -->
+        <div class="tab-panel active" data-panel="good">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <button class="btn btn-primary" onclick="openModal('modal-good-habit')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              إضافة عادة
+            </button>
+          </div>
+          <div id="good-habits-list"></div>
+        </div>
+
+        <!-- Bad Habits -->
+        <div class="tab-panel" data-panel="bad">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <button class="btn btn-outline" onclick="openModal('modal-bad-habit')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              إضافة عادة سيئة
+            </button>
+          </div>
+          <div id="bad-habits-list"></div>
+        </div>
+
+        <!-- Weekly Analysis -->
+        <div class="tab-panel" data-panel="analysis">
+          <div id="week-analysis"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ══ PAGE: DAY ══ -->
+    <main class="page" id="page-day">
+      <div class="page-header">
+        <div class="page-title">تنظيم اليوم</div>
+        <div class="page-sub">خطط يومك وتابع إنجازاتك</div>
+      </div>
+
+      <div class="tabs" id="day-tabs">
+        <div class="tab-list">
+          <button class="tab-btn active" data-tab="schedule">الجدول الثابت</button>
+          <button class="tab-btn" data-tab="tasks">مهام اليوم</button>
+          <button class="tab-btn" data-tab="eval">التقييم</button>
+          <button class="tab-btn" data-tab="history">السجل</button>
+        </div>
+
+        <!-- Schedule -->
+        <div class="tab-panel active" data-panel="schedule">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <button class="btn btn-primary" onclick="openModal('modal-schedule')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              إضافة نشاط
+            </button>
+          </div>
+          <div class="card">
+            <div class="card-body" id="schedule-list"></div>
+          </div>
+        </div>
+
+        <!-- Tasks -->
+        <div class="tab-panel" data-panel="tasks">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <button class="btn btn-primary" onclick="openModal('modal-task')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              إضافة مهمة
+            </button>
+          </div>
+          <div id="tasks-list"></div>
+        </div>
+
+        <!-- Eval -->
+        <div class="tab-panel" data-panel="eval">
+          <div class="card">
+            <div class="card-header"><span class="card-title">تقييم نهاية اليوم</span></div>
+            <div class="card-body stack">
+              <div class="input-group">
+                <label class="label">ماذا فاتك ولماذا؟</label>
+                <textarea id="eval-missed" placeholder="اكتب هنا..."></textarea>
+              </div>
+              <div class="input-group">
+                <label class="label">تقييم اليوم من 10</label>
+                <input type="number" id="eval-rating" min="1" max="10" step="0.5" placeholder="مثال: 7.5" />
+              </div>
+              <div class="input-group">
+                <label class="label">شيء واحد ستفعله غداً بشكل أفضل</label>
+                <input type="text" id="eval-better" placeholder="اكتب هنا..." />
+              </div>
+              <button class="btn btn-primary" id="save-eval-btn" onclick="saveEval()">حفظ التقييم</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div class="tab-panel" data-panel="history">
+          <div class="stats-row" style="margin-bottom:14px">
+            <div class="stat-card"><div class="stat-val" id="avg-7">—</div><div class="stat-lbl">متوسط آخر 7 أيام</div></div>
+            <div class="stat-card"><div class="stat-val" id="avg-30">—</div><div class="stat-lbl">متوسط آخر 30 يوم</div></div>
+          </div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-header"><span class="card-title">مخطط التقييم اليومي</span></div>
+            <div class="card-body chart-wrap">
+              <canvas id="rating-chart" width="700" height="180"></canvas>
+            </div>
+          </div>
+          <div id="day-history"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ══ PAGE: PROGRAMMING ══ -->
+    <main class="page" id="page-programming">
+      <div class="page-header">
+        <div class="page-title">مسار البرمجة</div>
+        <div class="page-sub">خارطة طريق واضحة لاحتراف تطوير الويب</div>
+      </div>
+
+      <div class="tabs" id="prog-tabs">
+        <div class="tab-list">
+          <button class="tab-btn active" data-tab="path">المسار</button>
+          <button class="tab-btn" data-tab="projects">المشاريع</button>
+          <button class="tab-btn" data-tab="resources">المصادر</button>
+        </div>
+
+        <!-- Path -->
+        <div class="tab-panel active" data-panel="path">
+          <div class="card card-highlight" style="margin-bottom:16px">
+            <div class="card-body">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="font-weight:700">التقدم الإجمالي</span>
+                <span style="font-size:22px;font-weight:800;color:var(--primary)" id="prog-overall-pct">0%</span>
+              </div>
+              <div class="progress-wrap"><div class="progress-bar" id="prog-overall-bar" style="width:0%"></div></div>
+              <p style="font-size:12px;color:var(--text-muted);margin-top:6px" id="prog-done-count"></p>
+            </div>
+          </div>
+          <div id="phases-list"></div>
+        </div>
+
+        <!-- Projects -->
+        <div class="tab-panel" data-panel="projects">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <button class="btn btn-primary" onclick="openModal('modal-project')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              إضافة مشروع
+            </button>
+          </div>
+          <div id="projects-list"></div>
+        </div>
+
+        <!-- Resources -->
+        <div class="tab-panel" data-panel="resources">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <button class="btn btn-outline" onclick="openModal('modal-resource')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              إضافة مصدر
+            </button>
+          </div>
+          <div id="resources-list"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ══ PAGE: SETTINGS ══ -->
+    <main class="page" id="page-settings">
+      <div class="page-header">
+        <div class="page-title">الإعدادات</div>
+        <div class="page-sub">تخصيص التطبيق وإدارة البيانات</div>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <div class="card-header"><span class="card-title">الاقتباس التحفيزي</span></div>
+          <div class="card-body stack">
+            <div class="input-group">
+              <label class="label">اقتباسك المفضل — يظهر كل يوم في لوحة التحكم</label>
+              <textarea id="settings-quote" placeholder="اكتب اقتباسك هنا..."></textarea>
+            </div>
+            <button class="btn btn-primary" id="save-settings-btn" onclick="saveSettings()">حفظ الإعدادات</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">الوضع</span></div>
+          <div class="card-body">
+            <button class="btn btn-outline" onclick="toggleTheme()">
+              تبديل الوضع النهاري / الليلي
+            </button>
+          </div>
+        </div>
+        <div class="card" style="border-color:var(--red)">
+          <div class="card-header"><span class="card-title" style="color:var(--red)">منطقة الخطر</span></div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">حذف جميع البيانات بشكل نهائي — لا يمكن التراجع.</p>
+            <button class="btn btn-danger" onclick="resetAllData()">حذف كل البيانات</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div><!-- end main-content -->
+</div><!-- end app-shell -->
+
+<!-- ═══════════════════════════════════════════════
+     BOTTOM NAV (mobile)
+════════════════════════════════════════════════ -->
+<nav class="bottom-nav" id="bottom-nav">
+  <div class="bottom-nav-inner" id="bottom-nav-inner"></div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     MODALS
+════════════════════════════════════════════════ -->
+
+<!-- Add Good Habit -->
+<div class="modal-backdrop" id="modal-good-habit">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">إضافة عادة جديدة</span>
+      <button class="btn-icon" onclick="closeModal('modal-good-habit')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group"><label class="label">اسم العادة</label><input type="text" id="gh-name" placeholder="مثال: القراءة يومياً" /></div>
+      <div class="input-group"><label class="label">الوقت المخصص (اختياري)</label><input type="text" id="gh-time" placeholder="مثال: 8:00 صباحاً" /></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" style="width:100%" onclick="addGoodHabit()">إضافة العادة</button></div>
+  </div>
+</div>
+
+<!-- Add Bad Habit -->
+<div class="modal-backdrop" id="modal-bad-habit">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">تتبع عادة سيئة</span>
+      <button class="btn-icon" onclick="closeModal('modal-bad-habit')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group"><label class="label">العادة التي تريد التوقف عنها</label><input type="text" id="bh-name" placeholder="مثال: التدخين" /></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" style="width:100%" onclick="addBadHabit()">بدء التتبع</button></div>
+  </div>
+</div>
+
+<!-- Add Schedule Item -->
+<div class="modal-backdrop" id="modal-schedule">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">إضافة نشاط للجدول</span>
+      <button class="btn-icon" onclick="closeModal('modal-schedule')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group"><label class="label">الوقت</label><input type="time" id="sch-time" /></div>
+      <div class="input-group"><label class="label">النشاط</label><input type="text" id="sch-label" placeholder="مثال: الاستيقاظ، الإفطار..." /></div>
+      <div class="input-group"><label class="label">المدة (بالدقائق، اختياري)</label><input type="number" id="sch-dur" placeholder="مثال: 30" /></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" style="width:100%" onclick="addScheduleItem()">إضافة النشاط</button></div>
+  </div>
+</div>
+
+<!-- Add Task -->
+<div class="modal-backdrop" id="modal-task">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">إضافة مهمة</span>
+      <button class="btn-icon" onclick="closeModal('modal-task')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group"><label class="label">المهمة</label><input type="text" id="task-text" placeholder="اكتب مهمتك هنا..." /></div>
+      <div class="input-group">
+        <label class="label">الأولوية</label>
+        <select id="task-priority">
+          <option value="1">أساسية — لا يمكن تجاوزها (الأولوية 1)</option>
+          <option value="2">إضافية (الأولوية 2)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" style="width:100%" onclick="addTask()">إضافة المهمة</button></div>
+  </div>
+</div>
+
+<!-- Add Project -->
+<div class="modal-backdrop" id="modal-project">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">تسجيل مشروع جديد</span>
+      <button class="btn-icon" onclick="closeModal('modal-project')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group"><label class="label">اسم المشروع</label><input type="text" id="proj-name" /></div>
+      <div class="input-group"><label class="label">وصف قصير</label><input type="text" id="proj-desc" /></div>
+      <div class="input-group"><label class="label">التقنيات (مفصولة بفاصلة)</label><input type="text" id="proj-tech" dir="ltr" placeholder="React, Tailwind, Node.js" /></div>
+      <div class="input-group"><label class="label">رابط المشروع / GitHub</label><input type="url" id="proj-link" dir="ltr" placeholder="https://..." /></div>
+      <div class="input-group"><label class="label">أهم ما تعلمته</label><textarea id="proj-learned"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" style="width:100%" onclick="addProject()">حفظ المشروع</button></div>
+  </div>
+</div>
+
+<!-- Add Resource -->
+<div class="modal-backdrop" id="modal-resource">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">إضافة مصدر تعلم</span>
+      <button class="btn-icon" onclick="closeModal('modal-resource')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group"><label class="label">اسم المصدر</label><input type="text" id="res-name" /></div>
+      <div class="input-group"><label class="label">الرابط</label><input type="url" id="res-url" dir="ltr" placeholder="https://..." /></div>
+      <div class="input-group">
+        <label class="label">نوع المصدر</label>
+        <select id="res-type">
+          <option value="يوتيوب">قناة / فيديو يوتيوب</option>
+          <option value="موقع">موقع ويب / مقال</option>
+          <option value="كورس">دورة تعليمية</option>
+          <option value="كتاب">كتاب</option>
+        </select>
+      </div>
+      <div class="input-group"><label class="label">ملاحظة قصيرة</label><input type="text" id="res-note" placeholder="لماذا هذا المصدر مفيد؟" /></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" style="width:100%" onclick="addResource()">حفظ المصدر</button></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  // Init tabs after DOM is ready (called once per page visit)
+  document.addEventListener('DOMContentLoaded', () => {
+    ['#eng-tabs','#habits-tabs','#day-tabs','#prog-tabs'].forEach(initTabs);
+    // Add settings to navigation
+    const sidebarNav = document.getElementById('sidebar-nav');
+    const settingsItem = document.createElement('div');
+    settingsItem.className = 'nav-item';
+    settingsItem.dataset.id = 'settings';
+    settingsItem.onclick = () => navigate('settings');
+    settingsItem.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>الإعدادات</span>`;
+    sidebarNav.appendChild(settingsItem);
+  });
+
+  // Override navigate to handle settings page
+  const _navigate = navigate;
+  window.navigate = function(id) {
+    if (id === 'settings') {
+      state.currentSection = 'settings';
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.id === 'settings'));
+      document.querySelectorAll('.bnav-item').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(el => el.classList.toggle('active', el.id === 'page-settings'));
+      document.getElementById('header-title').textContent = 'الإعدادات';
+      document.getElementById('settings-quote').value = state.quote;
+      closeSidebar();
+      return;
+    }
+    _navigate(id);
+  };
+</script>
+</body>
+</html>
