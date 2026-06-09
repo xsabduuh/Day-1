@@ -548,3 +548,39 @@ canvas#rating-chart { max-width: 100%; }
 .scroll-box { max-height: 420px; overflow-y: auto; padding-left: 4px; }
 .scroll-box::-webkit-scrollbar { width: 4px; }
 .scroll-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ============================================================
+   إضافات جديدة: منع التكبير التلقائي وتعطيل الضغطتين والنسخ
+   ============================================================ */
+body, .app-shell, .card, .page, .sidebar, .header, .quick-btn, 
+.habit-name, .plan-item, .vocab-card, .writing-entry, .grammar-card, 
+.proj-card, .resource-card, .schedule-item, .task-item, .stat-card, 
+.phase-title, .skill-item label, .nav-item span, .bnav-item span,
+.quote-text, .quote-empty, .phase-desc, .proj-desc, .tech-tag,
+.resource-note, .card-title, .page-title, .page-sub, .streak-badge,
+.cal-day, .task-priority, .badge, .btn, .modal-title {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* السماح بالنسخ داخل حقول الإدخال والنصوص القابلة للكتابة */
+input, textarea, [contenteditable="true"] {
+  -webkit-touch-callout: default;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* منع التكبير التلقائي عند التركيز على الحقول (بسبب حجم الخط) */
+input, textarea, select, button {
+  font-size: 16px;
+}
+input:focus, textarea:focus, select:focus {
+  font-size: 16px;
+}
