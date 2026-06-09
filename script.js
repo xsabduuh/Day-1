@@ -32,15 +32,6 @@
       CURRENT_DATA_VERSION وآلية الترقية. عدم الالتزام بذلك سيؤدي إلى فقدان بيانات المستخدم.
    ========================================================= */
 
-const CURRENT_DATA_VERSION = 1;
-
-// ... باقي الكود (ENGLISH_PLAN, PROG_PATH, S, state, functions, etc.)
-
-/* =========================================================
-   مسار حياتي — script.js
-   الإصدار: 1.0 (مزود بنظام ترقية البيانات)
-   ========================================================= */
-
 // ─── 90-Day English Plan ───────────────────────────────────
 const ENGLISH_PLAN = [
   "تعلم هيكل Present Simple — ضمائر المفرد والجمع + قاعدة إضافة s/es",
@@ -1167,14 +1158,10 @@ function resetAllData() {
 
 // ─── INIT ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // أولاً: ترقية البيانات إذا لزم الأمر
   migrateData();
-  // ثانياً: تحميل الحالة من localStorage
   loadState();
-  // ثالثاً: بناء الواجهات
   applyTheme();
 
-  // بناء القوائم
   const sidebarNav = document.getElementById('sidebar-nav');
   sidebarNav.innerHTML = SECTIONS.map(s => `
     <div class="nav-item${s.id===state.currentSection?' active':''}" data-id="${s.id}" onclick="navigate('${s.id}')">
@@ -1187,7 +1174,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ${s.icon}<span>${s.label}</span>
     </div>`).join('');
 
-  // إضافة زر الإعدادات للقائمة الجانبية
   if (!document.querySelector('.nav-item[data-id="settings"]')) {
     const settingsItem = document.createElement('div');
     settingsItem.className = 'nav-item';
