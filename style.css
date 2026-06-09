@@ -294,18 +294,27 @@ select { appearance: none; cursor: pointer; }
 .stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
 /* ─── Day Calendar ─── */
-.mini-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.mini-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-top: 8px;
+}
 .cal-day {
   aspect-ratio: 1;
-  border-radius: 4px;
+  border-radius: 3px;
   background: var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 500;
   color: var(--text-muted);
+  transition: all 0.1s ease;
 }
 .cal-day.done { background: var(--primary); color: #fff; }
 .cal-day.relapse { background: var(--red); color: #fff; }
-.cal-day.today { outline: 2px solid var(--primary); }
+.cal-day.today { outline: 1px solid var(--primary); outline-offset: 1px; }
 
 /* ─── Empty State ─── */
 .empty {
@@ -550,7 +559,7 @@ canvas#rating-chart { max-width: 100%; }
 .scroll-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 
 /* ============================================================
-   إضافات جديدة: منع التكبير التلقائي وتعطيل الضغطتين والنسخ
+   منع التكبير والنسخ (تم الاحتفاظ بها من التعديلات السابقة)
    ============================================================ */
 body, .app-shell, .card, .page, .sidebar, .header, .quick-btn, 
 .habit-name, .plan-item, .vocab-card, .writing-entry, .grammar-card, 
@@ -567,7 +576,6 @@ body, .app-shell, .card, .page, .sidebar, .header, .quick-btn,
   user-select: none;
 }
 
-/* السماح بالنسخ داخل حقول الإدخال والنصوص القابلة للكتابة */
 input, textarea, [contenteditable="true"] {
   -webkit-touch-callout: default;
   -webkit-user-select: text;
@@ -577,7 +585,6 @@ input, textarea, [contenteditable="true"] {
   user-select: text;
 }
 
-/* منع التكبير التلقائي عند التركيز على الحقول (بسبب حجم الخط) */
 input, textarea, select, button {
   font-size: 16px;
 }
