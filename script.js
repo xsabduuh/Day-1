@@ -294,14 +294,9 @@ function migrateData() {
 
   let newVersion = version;
 
-  // مثال للترقية من الإصدار 0 إلى 1 (أول تشغيل)
   if (newVersion === 0) {
-    // لا نحتاج لأي تغيير، فقط نسجل الإصدار
     newVersion = 1;
   }
-
-  // هنا ستضيف ترقيات مستقبلية
-  // if (newVersion < 2) { ... newVersion = 2; }
 
   if (newVersion !== version) {
     localStorage.setItem('massar_data_version', newVersion);
@@ -446,7 +441,7 @@ function progressHtml(val, cls = '') {
   return `<div class="progress-wrap"><div class="progress-bar ${cls}" style="width:${Math.min(100, Math.max(0, val))}%"></div></div>`;
 }
 
-// ─── DASHBOARD ─────────────────────────────────────────────
+// ─── DASHBOARD (تم إزالة "وصول سريع") ──────────────────────
 function renderDashboard() {
   const t = today();
   const tasks = state.todayTasks[t] || [];
@@ -471,6 +466,7 @@ function renderDashboard() {
   document.getElementById('dash-content').innerHTML = `
     <div class="stack">
       <div class="quote-card">${quoteHtml}</div>
+
       <div class="grid-2">
         <div class="card">
           <div class="card-header"><span class="card-title">إنجاز اليوم</span><span class="badge badge-blue">${doneT} من ${tasks.length}</span></div>
@@ -484,20 +480,13 @@ function renderDashboard() {
           <div class="card-body"><p style="font-size:14px;font-weight:600">${importantTask}</p></div>
         </div>
       </div>
+
       <div class="card">
         <div class="card-header">
           <span class="card-title">عادات اليوم</span>
           <button class="btn btn-sm btn-outline" onclick="navigate('habits')">إدارة العادات</button>
         </div>
         <div class="card-body">${habitsHtml}</div>
-      </div>
-      <div>
-        <p style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:10px">وصول سريع</p>
-        <div class="quick-btns">
-          ${SECTIONS.filter(s=>s.id!=='dashboard').map(s=>`
-            <button class="quick-btn" onclick="navigate('${s.id}')">${s.icon}<span>${s.label}</span></button>
-          `).join('')}
-        </div>
       </div>
     </div>
   `;
@@ -604,7 +593,7 @@ function engAddGrammar() {
   renderEnglish();
 }
 
-// ─── HABITS ────────────────────────────────────────────────
+// ─── HABITS (مع تصغير ارتفاع بطاقة العادة) ─────────────────
 function renderHabits() {
   const t = today();
 
@@ -614,7 +603,7 @@ function renderHabits() {
         const doneToday = !!state.habitLogs[h.id + '_' + t];
         const calHtml = miniCalHtml(h.id, state.habitLogs);
         return `
-          <div class="card habit-card" style="margin-bottom:12px">
+          <div class="card habit-card" style="margin-bottom:8px">
             <div class="habit-top">
               <div>
                 <div class="habit-name">${h.name}</div>
@@ -643,7 +632,7 @@ function renderHabits() {
         const streak = calcStreakBad(h.id);
         const calHtml = miniCalBadHtml(h.id);
         return `
-          <div class="card habit-card" style="margin-bottom:12px">
+          <div class="card habit-card" style="margin-bottom:8px">
             <div class="habit-top">
               <div>
                 <div class="habit-name">${h.name}</div>
@@ -706,7 +695,7 @@ function miniCalHtml(habitId, logs) {
   const year = now.getFullYear(); const month = now.getMonth();
   const daysInMonth = new Date(year, month+1, 0).getDate();
   const todayN = now.getDate();
-  let html = '<div class="mini-cal" style="margin-top:10px">';
+  let html = '<div class="mini-cal" style="margin-top:6px">';
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const done = !!logs[habitId + '_' + dateStr];
@@ -723,7 +712,7 @@ function miniCalBadHtml(habitId) {
   const daysInMonth = new Date(year, month+1, 0).getDate();
   const todayN = now.getDate();
   const relapseSet = new Set((state.relapses[habitId] || []).map(d => d.slice(0,10)));
-  let html = '<div class="mini-cal" style="margin-top:10px">';
+  let html = '<div class="mini-cal" style="margin-top:6px">';
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isRelapse = relapseSet.has(dateStr);
