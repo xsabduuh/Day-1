@@ -1,6 +1,5 @@
 /* =========================================================
-   مسار حياتي — script.js
-   كل البيانات تُخزَّن في localStorage
+   مسار حياتي — script.js (نسخة مصححة للتوقيت المغربي والأرقام الغربية)
    ========================================================= */
 
 // ─── 90-Day English Plan ───────────────────────────────────
@@ -190,18 +189,18 @@ let state = {
   // Habits
   goodHabits: S.get('good_habits', []),
   badHabits: S.get('bad_habits', []),
-  habitLogs: S.get('habit_logs', {}),    // { "habitId_YYYY-MM-DD": bool }
-  badLogs: S.get('bad_logs', {}),        // { "habitId_YYYY-MM-DD": bool }
-  relapses: S.get('relapses', {}),       // { habitId: [date,...] }
+  habitLogs: S.get('habit_logs', {}),
+  badLogs: S.get('bad_logs', {}),
+  relapses: S.get('relapses', {}),
 
   // Day
   schedule: S.get('schedule', []),
-  todayTasks: S.get('today_tasks', {}),  // { "YYYY-MM-DD": [{id,text,priority,done}] }
-  dayEvals: S.get('day_evals', {}),      // { "YYYY-MM-DD": {missed,rating,better} }
+  todayTasks: S.get('today_tasks', {}),
+  dayEvals: S.get('day_evals', {}),
 
   // Programming
-  progSkills: S.get('prog_skills', {}),  // { skillId: bool }
-  progPhases: S.get('prog_phases', {}),  // { phaseId: {status, completionDate} }
+  progSkills: S.get('prog_skills', {}),
+  progPhases: S.get('prog_phases', {}),
   projects: S.get('projects', []),
   resources: S.get('resources', []),
 
@@ -230,19 +229,51 @@ function save() {
   S.set('quote', state.quote);
 }
 
-// ─── Utilities ─────────────────────────────────────────────
-const today = () => new Date().toISOString().slice(0, 10);
-const uid   = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+// ═══════════════════════════════════════════════════════════
+//   دوال التاريخ والتوقيت (المغرب - أرقام غربية)
+// ═══════════════════════════════════════════════════════════
+function getCurrentDateInMorocco() {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Casablanca',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  return formatter.format(now); // YYYY-MM-DD
+}
 
-function dateAr(d) {
-  return new Date(d).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+function today() {
+  return getCurrentDateInMorocco();
+}
+
+const DATE_OPTIONS = {
+  timeZone: 'Africa/Casablanca',
+  numberingSystem: 'latn',
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+};
+
+function dateAr(dateStr) {
+  if (!dateStr) return '—';
+  try {
+    let d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '—';
+    return new Intl.DateTimeFormat('ar-MA', DATE_OPTIONS).format(d);
+  } catch {
+    return '—';
+  }
 }
 
 function todayAr() {
-  return new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  return new Intl.DateTimeFormat('ar-MA', DATE_OPTIONS).format(new Date());
 }
 
-// ─── SVG Icons ─────────────────────────────────────────────
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+// ─── SVG Icons (نفسها) ─────────────────────────────────────────
 const I = {
   home: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
   book: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
@@ -280,17 +311,12 @@ const SECTIONS = [
 
 function navigate(id) {
   state.currentSection = id;
-  // Desktop nav
   document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.id === id));
-  // Bottom nav
   document.querySelectorAll('.bnav-item').forEach(el => el.classList.toggle('active', el.dataset.id === id));
-  // Pages
   document.querySelectorAll('.page').forEach(el => el.classList.toggle('active', el.id === 'page-' + id));
-  // Mobile header title
   const sec = SECTIONS.find(s => s.id === id);
   const ht = document.getElementById('header-title');
   if (ht && sec) ht.textContent = sec.label;
-  // Render
   renderSection(id);
   closeSidebar();
 }
@@ -350,13 +376,10 @@ function progressHtml(val, cls = '') {
 // ─── DASHBOARD ─────────────────────────────────────────────
 function renderDashboard() {
   const t = today();
-
-  // Tasks completion
   const tasks = state.todayTasks[t] || [];
   const doneT = tasks.filter(tk => tk.done).length;
   const pct   = tasks.length ? Math.round(doneT / tasks.length * 100) : 0;
 
-  // Habits today
   const habitsHtml = state.goodHabits.length ? state.goodHabits.map(h => {
     const done = !!state.habitLogs[h.id + '_' + t];
     return `<div class="check-item${done?' done':''}">
@@ -365,19 +388,16 @@ function renderDashboard() {
     </div>`;
   }).join('') : `<p style="color:var(--text-muted);font-size:13px">لم تُضف أي عادات بعد.</p>`;
 
-  // Quote
   const quoteHtml = state.quote
     ? `<div class="quote-icon">${I.quote}</div><p class="quote-text">${state.quote}</p>`
     : `<div class="quote-icon">${I.quote}</div><p class="quote-empty">أضف اقتباسك التحفيزي من الإعدادات</p>`;
 
-  // Most important task
   const p1Tasks = tasks.filter(tk => tk.priority === 1 && !tk.done);
   const importantTask = p1Tasks[0] ? p1Tasks[0].text : (tasks.length ? 'أنجزت جميع المهام! أداء رائع.' : 'لا توجد مهام لليوم بعد.');
 
   document.getElementById('dash-content').innerHTML = `
     <div class="stack">
       <div class="quote-card">${quoteHtml}</div>
-
       <div class="grid-2">
         <div class="card">
           <div class="card-header"><span class="card-title">إنجاز اليوم</span><span class="badge badge-blue">${doneT} من ${tasks.length}</span></div>
@@ -391,7 +411,6 @@ function renderDashboard() {
           <div class="card-body"><p style="font-size:14px;font-weight:600">${importantTask}</p></div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-header">
           <span class="card-title">عادات اليوم</span>
@@ -399,7 +418,6 @@ function renderDashboard() {
         </div>
         <div class="card-body">${habitsHtml}</div>
       </div>
-
       <div>
         <p style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:10px">وصول سريع</p>
         <div class="quick-btns">
@@ -410,7 +428,6 @@ function renderDashboard() {
       </div>
     </div>
   `;
-
   document.getElementById('dash-date').textContent = todayAr();
 }
 
@@ -427,7 +444,6 @@ function renderEnglish() {
   const lesson = ENGLISH_PLAN[state.engDay - 1] || 'تم إنجاز الخطة بنجاح!';
   const pct = Math.round((state.engDay - 1) / 90 * 100);
 
-  // Today tab
   document.getElementById('eng-day-num').textContent = `اليوم ${state.engDay} من 90`;
   document.getElementById('eng-lesson').textContent = lesson;
   document.getElementById('eng-prev-btn').disabled = state.engDay <= 1;
@@ -435,7 +451,6 @@ function renderEnglish() {
   document.getElementById('eng-progress-bar').style.width = pct + '%';
   document.getElementById('eng-progress-text').textContent = `اليوم ${state.engDay} من 90 — ${pct}%`;
 
-  // Vocab tab
   const vq = document.getElementById('vocab-search')?.value?.toLowerCase() || '';
   const filtered = state.engVocab.filter(v => v.word.toLowerCase().includes(vq) || v.meaning.includes(vq));
   document.getElementById('vocab-count').textContent = `${state.engVocab.length} كلمة`;
@@ -448,14 +463,12 @@ function renderEnglish() {
         </div>`).join('')}</div>`
     : `<div class="empty"><p>لا توجد نتائج.</p></div>`;
 
-  // Writings tab
   document.getElementById('writings-list').innerHTML = [...state.engWritings].reverse().map(w => `
     <div class="writing-entry">
       <div class="writing-date">${dateAr(w.date)}</div>
       <div class="writing-content">${w.content}</div>
     </div>`).join('') || `<div class="empty"><p>لا توجد كتابات بعد.</p></div>`;
 
-  // Grammar tab
   document.getElementById('grammar-list').innerHTML = state.engGrammar.map(r => `
     <div class="card grammar-card">
       <div class="grammar-title">${r.title}</div>
@@ -463,7 +476,6 @@ function renderEnglish() {
       ${r.example ? `<div class="grammar-ex">${r.example}</div>` : ''}
     </div>`).join('') || `<div class="empty"><p>لم تُضف أي قواعد بعد.</p></div>`;
 
-  // Plan tab
   document.getElementById('plan-list').innerHTML = ENGLISH_PLAN.map((l, i) => {
     const n = i + 1;
     let cls = '';
@@ -472,7 +484,6 @@ function renderEnglish() {
     return `<div class="plan-item ${cls}"><span class="plan-num">${n}</span><span>${l}</span></div>`;
   }).join('');
 
-  // Scroll current into view
   setTimeout(() => {
     const cur = document.querySelector('.plan-item.current');
     if (cur) cur.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -524,7 +535,6 @@ function engAddGrammar() {
 function renderHabits() {
   const t = today();
 
-  // Good habits
   document.getElementById('good-habits-list').innerHTML = state.goodHabits.length
     ? state.goodHabits.map(h => {
         const streak = calcStreak(h.id, state.habitLogs, h.startDate);
@@ -535,7 +545,7 @@ function renderHabits() {
             <div class="habit-top">
               <div>
                 <div class="habit-name">${h.name}</div>
-                <div class="habit-meta">${h.time ? 'الوقت: ' + h.time + ' — ' : ''}بدأت: ${new Date(h.startDate).toLocaleDateString('ar-SA')}</div>
+                <div class="habit-meta">${h.time ? 'الوقت: ' + h.time + ' — ' : ''}بدأت: ${dateAr(h.startDate)}</div>
               </div>
               <div style="text-align:center">
                 <div class="streak-badge">${I.flame} ${streak}</div>
@@ -555,18 +565,16 @@ function renderHabits() {
       }).join('')
     : `<div class="empty">${I.activity}<p>لا توجد عادات بعد.</p><p>أضف عادة جديدة لتبدأ التتبع.</p></div>`;
 
-  // Bad habits
   document.getElementById('bad-habits-list').innerHTML = state.badHabits.length
     ? state.badHabits.map(h => {
         const streak = calcStreakBad(h.id);
-        const doneToday = !!state.badLogs[h.id + '_' + t];
         const calHtml = miniCalBadHtml(h.id);
         return `
           <div class="card habit-card" style="margin-bottom:12px">
             <div class="habit-top">
               <div>
                 <div class="habit-name">${h.name}</div>
-                <div class="habit-meta">تاريخ الامتناع: ${new Date(h.quitDate).toLocaleDateString('ar-SA')}</div>
+                <div class="habit-meta">تاريخ الامتناع: ${dateAr(h.quitDate)}</div>
               </div>
               <div style="text-align:center">
                 <div class="streak-badge" style="color:var(--green)">${streak}</div>
@@ -574,7 +582,7 @@ function renderHabits() {
               </div>
             </div>
             ${calHtml}
-            ${(state.relapses[h.id] || []).length ? `<p style="font-size:11px;color:var(--text-muted);margin:6px 0">انتكاسات سابقة: ${(state.relapses[h.id]).map(d=>new Date(d).toLocaleDateString('ar-SA')).join('، ')}</p>` : ''}
+            ${(state.relapses[h.id] || []).length ? `<p style="font-size:11px;color:var(--text-muted);margin:6px 0">انتكاسات سابقة: ${(state.relapses[h.id]).map(d=>dateAr(d)).join('، ')}</p>` : ''}
             <div class="habit-actions">
               <button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red)" onclick="recordRelapse('${h.id}')">
                 انتكست اليوم
@@ -587,18 +595,23 @@ function renderHabits() {
       }).join('')
     : `<div class="empty">${I.activity}<p>لا توجد عادات سيئة مُتابَعة.</p></div>`;
 
-  // Weekly analysis
-  const weekAnalysis = buildWeekAnalysis();
-  document.getElementById('week-analysis').innerHTML = weekAnalysis;
+  document.getElementById('week-analysis').innerHTML = buildWeekAnalysis();
 }
 
 function calcStreak(habitId, logs, startDate) {
   let streak = 0;
   const start = new Date(startDate);
   const t = new Date();
-  t.setHours(0,0,0,0);
-  for (let d = new Date(t); d >= start; d.setDate(d.getDate()-1)) {
-    const k = habitId + '_' + d.toISOString().slice(0,10);
+  const tzOffset = 0; // نستخدم التوقيت المحلي للمتصفح ولكن التاريخ يعتمد على today()
+  // الأفضل حساب الـ streak بناءً على الأيام المتتالية باستخدام today()
+  let current = new Date();
+  current.setHours(0,0,0,0);
+  for (let d = current; d >= start; d.setDate(d.getDate()-1)) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const ds = `${yyyy}-${mm}-${dd}`;
+    const k = habitId + '_' + ds;
     if (logs[k]) streak++;
     else break;
   }
@@ -611,7 +624,8 @@ function calcStreakBad(habitId) {
   const lastRelapse = (state.relapses[habitId] || []).at(-1);
   const start = lastRelapse ? new Date(lastRelapse) : new Date(h.quitDate);
   start.setDate(start.getDate() + 1);
-  const t = new Date(); t.setHours(0,0,0,0);
+  let t = new Date();
+  t.setHours(0,0,0,0);
   let days = 0;
   for (let d = new Date(start); d <= t; d.setDate(d.getDate()+1)) days++;
   return Math.max(0, days);
@@ -651,11 +665,15 @@ function miniCalBadHtml(habitId) {
 }
 
 function buildWeekAnalysis() {
-  const t = new Date(); t.setHours(0,0,0,0);
   let totalChecks = 0; let totalPossible = 0;
+  const t = new Date();
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(t); d.setDate(d.getDate()-i);
-    const ds = d.toISOString().slice(0,10);
+    const d = new Date(t);
+    d.setDate(d.getDate() - i);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const ds = `${yyyy}-${mm}-${dd}`;
     state.goodHabits.forEach(h => {
       totalPossible++;
       if (state.habitLogs[h.id+'_'+ds]) totalChecks++;
@@ -694,7 +712,6 @@ function toggleHabit(id) {
   state.habitLogs[key] = !state.habitLogs[key];
   save();
   renderHabits();
-  // Update dashboard if visible
   if (state.currentSection === 'dashboard') renderDashboard();
 }
 
@@ -747,7 +764,6 @@ function renderDay() {
   const t = today();
   const tasks = state.todayTasks[t] || [];
 
-  // Schedule tab
   document.getElementById('schedule-list').innerHTML = state.schedule.length
     ? state.schedule.map(s => `
         <div class="schedule-item">
@@ -758,7 +774,6 @@ function renderDay() {
         </div>`).join('')
     : `<div class="empty"><p>لا يوجد جدول ثابت بعد.</p></div>`;
 
-  // Tasks tab
   const p1 = tasks.filter(tk=>tk.priority===1);
   const p2 = tasks.filter(tk=>tk.priority===2);
   document.getElementById('tasks-list').innerHTML = `
@@ -769,13 +784,11 @@ function renderDay() {
     ${!tasks.length ? `<div class="empty"><p>لا توجد مهام لليوم.</p></div>` : ''}
   `;
 
-  // Eval tab
   const eval_ = state.dayEvals[t] || {};
   document.getElementById('eval-missed').value = eval_.missed || '';
   document.getElementById('eval-rating').value = eval_.rating || '';
   document.getElementById('eval-better').value = eval_.better || '';
 
-  // History tab
   renderDayHistory();
 }
 
@@ -882,7 +895,6 @@ function renderDayHistory() {
       ${ev.better ? `<p style="font-size:12px;margin-top:4px"><strong>الغد:</strong> ${ev.better}</p>` : ''}
     </div>`).join('');
 
-  // Chart
   setTimeout(() => drawRatingChart(entries.slice(0,30).reverse()), 50);
 }
 
@@ -905,7 +917,6 @@ function drawRatingChart(entries) {
   const xs = filtered.map((_,i) => pad.left + i * ((W - pad.left - pad.right) / (filtered.length - 1)));
   const ys = filtered.map(([,v]) => H - pad.bottom - ((v.rating / 10) * (H - pad.top - pad.bottom)));
 
-  // Grid
   ctx.strokeStyle = gridColor; ctx.lineWidth = 1;
   for (let i = 0; i <= 5; i++) {
     const y = H - pad.bottom - (i/5) * (H - pad.top - pad.bottom);
@@ -914,16 +925,13 @@ function drawRatingChart(entries) {
     ctx.fillText((i*2).toString(), 4, y + 4);
   }
 
-  // Line
   ctx.beginPath(); ctx.moveTo(xs[0], ys[0]);
   xs.forEach((x,i) => { if (i>0) ctx.lineTo(x, ys[i]); });
   ctx.strokeStyle = lineColor; ctx.lineWidth = 2; ctx.stroke();
 
-  // Dots
   xs.forEach((x,i) => {
     ctx.beginPath(); ctx.arc(x, ys[i], 4, 0, Math.PI*2);
     ctx.fillStyle = lineColor; ctx.fill();
-    // Date label
     ctx.fillStyle = textColor; ctx.font = '9px Cairo';
     ctx.fillText(filtered[i][0].slice(5), x - 12, H - 4);
   });
@@ -940,7 +948,6 @@ function renderProgramming() {
   document.getElementById('prog-overall-bar').style.width = pct + '%';
   document.getElementById('prog-done-count').textContent = `أتقنت ${doneSkills} من ${totalSkills} مهارة`;
 
-  // Phases
   document.getElementById('phases-list').innerHTML = PROG_PATH.map((phase, idx) => {
     const phaseDone  = phase.skills.filter(s => state.progSkills[s.id]).length;
     const phaseTotal = phase.skills.length;
@@ -983,14 +990,13 @@ function renderProgramming() {
               <option value="completed"   ${phaseStatus==='completed'?'selected':''}>أنهيت المرحلة</option>
             </select>
             ${phaseStatus==='completed' && state.progPhases[phase.id]?.completionDate
-              ? `<span style="font-size:11px;color:var(--text-muted)">أنجزت في: ${new Date(state.progPhases[phase.id].completionDate).toLocaleDateString('ar-SA')}</span>`
+              ? `<span style="font-size:11px;color:var(--text-muted)">أنجزت في: ${dateAr(state.progPhases[phase.id].completionDate)}</span>`
               : ''}
           </div>
         </div>
       </div>`;
   }).join('');
 
-  // Projects
   document.getElementById('projects-list').innerHTML = state.projects.length
     ? `<div class="grid-2">${state.projects.map(p => `
         <div class="card proj-card">
@@ -1008,7 +1014,6 @@ function renderProgramming() {
         </div>`).join('')}</div>`
     : `<div class="empty">${I.briefcase}<p>لا توجد مشاريع بعد.</p><p>المشاريع هي أفضل طريقة للتعلم!</p></div>`;
 
-  // Resources
   document.getElementById('resources-list').innerHTML = state.resources.length
     ? state.resources.map(r => `
         <a href="${r.url}" target="_blank" class="card" style="display:block;text-decoration:none">
@@ -1085,34 +1090,31 @@ function resetAllData() {
 document.addEventListener('DOMContentLoaded', () => {
   applyTheme();
 
-  // Build sidebar nav
   const sidebarNav = document.getElementById('sidebar-nav');
   sidebarNav.innerHTML = SECTIONS.map(s => `
     <div class="nav-item${s.id===state.currentSection?' active':''}" data-id="${s.id}" onclick="navigate('${s.id}')">
       ${s.icon}<span>${s.label}</span>
     </div>`).join('');
 
-  // Build bottom nav
   const bottomNav = document.getElementById('bottom-nav-inner');
   bottomNav.innerHTML = SECTIONS.map(s => `
     <div class="bnav-item${s.id===state.currentSection?' active':''}" data-id="${s.id}" onclick="navigate('${s.id}')">
       ${s.icon}<span>${s.label}</span>
     </div>`).join('');
 
-  // Init pages
   document.getElementById('page-' + state.currentSection).classList.add('active');
   renderSection(state.currentSection);
 
-  // Theme btn
   document.getElementById('theme-btn').innerHTML = state.theme === 'dark' ? I.sun : I.moon;
-
-  // Settings quote prefill
   document.getElementById('settings-quote').value = state.quote;
-
-  // Sidebar overlay click
   document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
 
-  // English vocab search
   const vs = document.getElementById('vocab-search');
   if (vs) vs.addEventListener('input', () => renderEnglish());
+
+  // تهيئة التبويبات
+  initTabs('#eng-tabs');
+  initTabs('#habits-tabs');
+  initTabs('#day-tabs');
+  initTabs('#prog-tabs');
 });
