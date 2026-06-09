@@ -25,18 +25,90 @@
   --transition: .2s ease;
 }
 
+/* ─── Dark Mode - AMOLED (أسود نقي) ─── */
 [data-theme="dark"] {
-  --bg: #0f172a;
-  --bg-card: #1e293b;
-  --bg-sidebar: #1e293b;
-  --border: #334155;
+  --bg: #000000;
+  --bg-card: #0a0a0a;
+  --bg-sidebar: #000000;
+  --border: #1f1f1f;
   --text: #f1f5f9;
-  --text-muted: #94a3b8;
-  --text-sidebar: #94a3b8;
-  --primary-light: #1e3a5f;
-  --primary-muted: #1e3a5f;
-  --shadow: 0 1px 3px rgba(0,0,0,.3);
-  --shadow-md: 0 4px 6px rgba(0,0,0,.3);
+  --text-muted: #a0a0a0;
+  --text-sidebar: #a0a0a0;
+  --primary-light: #1a2a4f;
+  --primary-muted: #1a2a4f;
+  --shadow: 0 1px 3px rgba(0,0,0,.6);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.6);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .habit-card,
+[data-theme="dark"] .phase-card,
+[data-theme="dark"] .proj-card,
+[data-theme="dark"] .grammar-card,
+[data-theme="dark"] .vocab-card,
+[data-theme="dark"] .writing-entry,
+[data-theme="dark"] .schedule-item,
+[data-theme="dark"] .task-item,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .resource-card,
+[data-theme="dark"] .modal,
+[data-theme="dark"] .quick-btn {
+  background: #0a0a0a;
+  border-color: #1f1f1f;
+}
+
+[data-theme="dark"] .btn-outline {
+  border-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .btn-outline:hover {
+  background: #1a1a1a;
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .icon-btn {
+  background: #0a0a0a;
+  border-color: #2a2a2a;
+}
+
+[data-theme="dark"] .nav-item:hover {
+  background: #1a1a1a;
+}
+
+[data-theme="dark"] .quick-btn:hover {
+  background: #1a1a1a;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: #0a0a0a;
+  border-color: #2a2a2a;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .badge-gray {
+  background: #1a1a1a;
+  color: #a0a0a0;
+}
+
+[data-theme="dark"] .p1 {
+  background: #2a0a0a;
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .p2 {
+  background: #1a1a1a;
+  color: #a0a0a0;
+}
+
+[data-theme="dark"] .check-item label {
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .check-item.done label {
+  color: #a0a0a0;
 }
 
 /* ─── Reset ─── */
@@ -363,7 +435,6 @@ select { appearance: none; cursor: pointer; }
   flex-wrap: wrap;
   margin-top: 8px;
 }
-/* تعديل الأزرار داخل العادة لتكون متناسبة مع الحجم الأصغر */
 .habit-actions .btn-sm {
   padding: 4px 10px;
   font-size: 11px;
@@ -521,7 +592,6 @@ canvas#rating-chart { max-width: 100%; }
 .task-priority { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
 .p1 { background: #fee2e2; color: #991b1b; }
 .p2 { background: var(--border); color: var(--text-muted); }
-[data-theme="dark"] .p1 { background: #450a0a; color: #fca5a5; }
 
 /* ─── Search ─── */
 .search-wrap { position: relative; }
@@ -557,7 +627,7 @@ canvas#rating-chart { max-width: 100%; }
   .grid-3 { grid-template-columns: 1fr; }
 }
 
-/* ─── Dashboard Quick Buttons ─── */
+/* ─── Dashboard Quick Buttons (تم إزالتها من JS، لكن الكود الاحتياطي موجود) ─── */
 .quick-btns { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 10px; }
 .quick-btn {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
