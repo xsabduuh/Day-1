@@ -1,5 +1,6 @@
 /* =========================================================
-   مسار حياتي — script.js (نسخة مصححة للتوقيت المغربي والأرقام الغربية)
+   مسار حياتي — script.js
+   الإصدار: 1.0 (مزود بنظام ترقية البيانات)
    ========================================================= */
 
 // ─── 90-Day English Plan ───────────────────────────────────
@@ -169,6 +170,9 @@ const PROG_PATH = [
   }
 ];
 
+// ─── إصدار البيانات الحالي ─────────────────────────────────
+const CURRENT_DATA_VERSION = 1;
+
 // ─── localStorage Helpers ──────────────────────────────────
 const S = {
   get: (key, def) => { try { const v = localStorage.getItem('massar_' + key); return v ? JSON.parse(v) : def; } catch { return def; } },
@@ -177,39 +181,63 @@ const S = {
 
 // ─── State ─────────────────────────────────────────────────
 let state = {
-  theme: S.get('theme', 'light'),
+  theme: 'light',
   currentSection: 'dashboard',
 
   // English
-  engDay: S.get('eng_day', 1),
-  engVocab: S.get('eng_vocab', []),
-  engWritings: S.get('eng_writings', []),
-  engGrammar: S.get('eng_grammar', []),
+  engDay: 1,
+  engVocab: [],
+  engWritings: [],
+  engGrammar: [],
 
   // Habits
-  goodHabits: S.get('good_habits', []),
-  badHabits: S.get('bad_habits', []),
-  habitLogs: S.get('habit_logs', {}),
-  badLogs: S.get('bad_logs', {}),
-  relapses: S.get('relapses', {}),
+  goodHabits: [],
+  badHabits: [],
+  habitLogs: {},
+  badLogs: {},
+  relapses: {},
 
   // Day
-  schedule: S.get('schedule', []),
-  todayTasks: S.get('today_tasks', {}),
-  dayEvals: S.get('day_evals', {}),
+  schedule: [],
+  todayTasks: {},
+  dayEvals: {},
 
   // Programming
-  progSkills: S.get('prog_skills', {}),
-  progPhases: S.get('prog_phases', {}),
-  projects: S.get('projects', []),
-  resources: S.get('resources', []),
+  progSkills: {},
+  progPhases: {},
+  projects: [],
+  resources: [],
 
   // Settings
-  quote: S.get('quote', '')
+  quote: ''
 };
 
-function save() {
+// ─── دوال حفظ وتحميل الحالة ─────────────────────────────────
+function loadState() {
+  state.theme          = S.get('theme', 'light');
+  state.currentSection = S.get('current_section', 'dashboard');
+  state.engDay         = S.get('eng_day', 1);
+  state.engVocab       = S.get('eng_vocab', []);
+  state.engWritings    = S.get('eng_writings', []);
+  state.engGrammar     = S.get('eng_grammar', []);
+  state.goodHabits     = S.get('good_habits', []);
+  state.badHabits      = S.get('bad_habits', []);
+  state.habitLogs      = S.get('habit_logs', {});
+  state.badLogs        = S.get('bad_logs', {});
+  state.relapses       = S.get('relapses', {});
+  state.schedule       = S.get('schedule', []);
+  state.todayTasks     = S.get('today_tasks', {});
+  state.dayEvals       = S.get('day_evals', {});
+  state.progSkills     = S.get('prog_skills', {});
+  state.progPhases     = S.get('prog_phases', {});
+  state.projects       = S.get('projects', []);
+  state.resources      = S.get('resources', []);
+  state.quote          = S.get('quote', '');
+}
+
+function saveState() {
   S.set('theme', state.theme);
+  S.set('current_section', state.currentSection);
   S.set('eng_day', state.engDay);
   S.set('eng_vocab', state.engVocab);
   S.set('eng_writings', state.engWritings);
@@ -229,9 +257,34 @@ function save() {
   S.set('quote', state.quote);
 }
 
-// ═══════════════════════════════════════════════════════════
-//   دوال التاريخ والتوقيت (المغرب - أرقام غربية)
-// ═══════════════════════════════════════════════════════════
+// ─── نظام ترقية البيانات (Migration) ─────────────────────────
+function migrateData() {
+  const savedVersion = localStorage.getItem('massar_data_version');
+  const version = savedVersion ? parseInt(savedVersion) : 0;
+  if (version === CURRENT_DATA_VERSION) return;
+
+  let newVersion = version;
+
+  // مثال للترقية من الإصدار 0 إلى 1 (أول تشغيل)
+  if (newVersion === 0) {
+    // لا نحتاج لأي تغيير، فقط نسجل الإصدار
+    newVersion = 1;
+  }
+
+  // هنا ستضيف ترقيات مستقبلية
+  // if (newVersion < 2) { ... newVersion = 2; }
+
+  if (newVersion !== version) {
+    localStorage.setItem('massar_data_version', newVersion);
+  } else if (version === 0) {
+    localStorage.setItem('massar_data_version', CURRENT_DATA_VERSION);
+  }
+}
+
+// ─── دوال مساعدة ───────────────────────────────────────────
+function save() { saveState(); }
+
+// دوال التاريخ (المغرب، أرقام غربية)
 function getCurrentDateInMorocco() {
   const now = new Date();
   const formatter = new Intl.DateTimeFormat('en-CA', {
@@ -240,13 +293,9 @@ function getCurrentDateInMorocco() {
     month: '2-digit',
     day: '2-digit'
   });
-  return formatter.format(now); // YYYY-MM-DD
+  return formatter.format(now);
 }
-
-function today() {
-  return getCurrentDateInMorocco();
-}
-
+function today() { return getCurrentDateInMorocco(); }
 const DATE_OPTIONS = {
   timeZone: 'Africa/Casablanca',
   numberingSystem: 'latn',
@@ -255,25 +304,20 @@ const DATE_OPTIONS = {
   month: 'long',
   day: 'numeric'
 };
-
 function dateAr(dateStr) {
   if (!dateStr) return '—';
   try {
     let d = new Date(dateStr);
     if (isNaN(d.getTime())) return '—';
     return new Intl.DateTimeFormat('ar-MA', DATE_OPTIONS).format(d);
-  } catch {
-    return '—';
-  }
+  } catch { return '—'; }
 }
-
 function todayAr() {
   return new Intl.DateTimeFormat('ar-MA', DATE_OPTIONS).format(new Date());
 }
-
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
 
-// ─── SVG Icons (نفسها) ─────────────────────────────────────────
+// ─── SVG Icons ─────────────────────────────────────────────
 const I = {
   home: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
   book: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
@@ -364,11 +408,11 @@ function initTabs(containerSel) {
   });
 }
 
-// ─── Modal helpers ──────────────────────────────────────────
+// ─── Modal helpers ─────────────────────────────────────────
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-// ─── Progress bar HTML ──────────────────────────────────────
+// ─── Progress bar HTML ─────────────────────────────────────
 function progressHtml(val, cls = '') {
   return `<div class="progress-wrap"><div class="progress-bar ${cls}" style="width:${Math.min(100, Math.max(0, val))}%"></div></div>`;
 }
@@ -602,11 +646,8 @@ function calcStreak(habitId, logs, startDate) {
   let streak = 0;
   const start = new Date(startDate);
   const t = new Date();
-  const tzOffset = 0; // نستخدم التوقيت المحلي للمتصفح ولكن التاريخ يعتمد على today()
-  // الأفضل حساب الـ streak بناءً على الأيام المتتالية باستخدام today()
-  let current = new Date();
-  current.setHours(0,0,0,0);
-  for (let d = current; d >= start; d.setDate(d.getDate()-1)) {
+  t.setHours(0,0,0,0);
+  for (let d = new Date(t); d >= start; d.setDate(d.getDate()-1)) {
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth()+1).padStart(2,'0');
     const dd = String(d.getDate()).padStart(2,'0');
@@ -1088,8 +1129,14 @@ function resetAllData() {
 
 // ─── INIT ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  // أولاً: ترقية البيانات إذا لزم الأمر
+  migrateData();
+  // ثانياً: تحميل الحالة من localStorage
+  loadState();
+  // ثالثاً: بناء الواجهات
   applyTheme();
 
+  // بناء القوائم
   const sidebarNav = document.getElementById('sidebar-nav');
   sidebarNav.innerHTML = SECTIONS.map(s => `
     <div class="nav-item${s.id===state.currentSection?' active':''}" data-id="${s.id}" onclick="navigate('${s.id}')">
@@ -1102,9 +1149,18 @@ document.addEventListener('DOMContentLoaded', () => {
       ${s.icon}<span>${s.label}</span>
     </div>`).join('');
 
+  // إضافة زر الإعدادات للقائمة الجانبية
+  if (!document.querySelector('.nav-item[data-id="settings"]')) {
+    const settingsItem = document.createElement('div');
+    settingsItem.className = 'nav-item';
+    settingsItem.dataset.id = 'settings';
+    settingsItem.onclick = () => navigate('settings');
+    settingsItem.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>الإعدادات</span>`;
+    sidebarNav.appendChild(settingsItem);
+  }
+
   document.getElementById('page-' + state.currentSection).classList.add('active');
   renderSection(state.currentSection);
-
   document.getElementById('theme-btn').innerHTML = state.theme === 'dark' ? I.sun : I.moon;
   document.getElementById('settings-quote').value = state.quote;
   document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
@@ -1112,7 +1168,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const vs = document.getElementById('vocab-search');
   if (vs) vs.addEventListener('input', () => renderEnglish());
 
-  // تهيئة التبويبات
   initTabs('#eng-tabs');
   initTabs('#habits-tabs');
   initTabs('#day-tabs');
